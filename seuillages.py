@@ -6,15 +6,13 @@ import pywt.data
 from scipy.fftpack import dct, idct
 
 # imports image
+
 f = pywt.data.camera()
+#f = pywt.data.nino()
+#f = pywt.data.ecg()
 n = f.shape[0]  # size of the image
 print('image size : ', n)
-plt.imshow(f, cmap='gray')
-plt.axis('off')
-plt.show()
 
-
-# OK, image size 512, image displays (ajouter titre etc)
 
 # functions
 def thresh(fw, M):
@@ -53,8 +51,8 @@ f1 = idct2(fd1)
 
 
 # WAVELET TRANSFORM
-WT = 'db2'  # celebrated Daubechies Wavelet
-# WT = 'haar' # produces a blocky approximation
+WT = 'db38'
+# WT = 'haar'
 
 # compute WT forms
 fw, S = pywt.coeffs_to_array(pywt.wavedec2(f, WT))
@@ -72,11 +70,14 @@ if display:
     plt.title('Compres. PSNR=' + '{:.2f}'.format(psnr(f, f1)) + 'dB')
     plt.show()
 
-    plt.subplot(1, 2, 1)
-    plt.imshow(fw1 != 0); plt.axis('off'); plt.title('Wavelets coefs')
-    plt.subplot(1, 2, 2)
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(fw != 0); plt.axis('off'); plt.title('Wavelets coefs')
+    plt.subplot(1, 3, 2)
+    plt.imshow(fw1 != 0); plt.axis('off'); plt.title('Wavelets coefs Treshold')
+    plt.subplot(1, 3, 3)
     plt.imshow(np.clip(f2,0,255), cmap='gray'); plt.axis('off')
-    plt.title('Compres. PSNR=' + '{:.2f}'.format(psnr(f,f2)) + 'dB' )
+    plt.title('Compres. PSNR=' + '{:.2f}'.format(psnr(f,f2)) + 'dB')
     plt.show()
 
     plt.imshow(np.clip(f1,0,255), cmap='gray')
@@ -88,8 +89,7 @@ if display:
     plt.show()
 
 
-def compression(WT, N):
-    f = pywt.data.camera()
+def compression(WT, list, f):
     n = f.shape[0]  # size of the image
     plt.imshow(f, cmap='gray')
     plt.axis('off')
@@ -98,8 +98,8 @@ def compression(WT, N):
 
     fw, S = pywt.coeffs_to_array(pywt.wavedec2(f, WT))
 
-    for x in range(1, N):
-        ratio = x / N
+    for x in list:
+        ratio = x / 100
         M = int(ratio * n ** 2)
 
         fw1 = thresh(fw, M)
@@ -117,6 +117,7 @@ def compression(WT, N):
         plt.show()
 
 
-compression('db2', 4)
+L=[1, 5]
+#L = [1, 5, 10, 25, 50, 100]
+compression(WT, L, f)
 
-print('code exited')
